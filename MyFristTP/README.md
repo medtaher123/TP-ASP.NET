@@ -20,7 +20,28 @@ app.MapControllerRoute(
 app.Run();
 ```
 
-Dans ce cas, une requête à `/Movie/Details/1` serait dirigée vers l'action `Details` du contrôleur `Movie`, avec `1` comme paramètre `id`. Les routes suivent le modèle : `/NomDuContrôleur/NomDeLAction/Id`.
+```csharp
+public class CustomerController : Controller
+    {
+
+        public IActionResult Index()
+        {
+            // logique pour recuperer les customers
+        }
+
+
+        public IActionResult Details(int id)
+        {
+            // logique pour recuperer uncustomer par son id
+        }
+
+
+    }
+```
+
+- **Exemple de contrôleur conventionnel : [CustomerController](Controllers/CustomerController.cs)**
+
+Dans ce cas, une requête à `/Customer/CustomerDetails/1` serait dirigée vers l'action `CustomerDetails` du contrôleur `Customer`, avec `1` comme paramètre `id`. Les routes suivent le modèle : `/NomDuContrôleur/NomDeLAction/Id`.
 
 ### 2. Routage par Attribut
 
@@ -43,6 +64,8 @@ public class MovieController : Controller
     }
 }
 ```
+
+- **Exemple de routage par attribut : [MovieController](Controllers/MovieController.cs)**
 
 Dans cet exemple, la route `/movies/1` accéderait directement à l’action `GetMovie` avec l’ID passé comme paramètre.
 

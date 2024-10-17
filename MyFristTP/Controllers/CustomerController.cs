@@ -15,7 +15,7 @@ namespace MyFirstTP.Controllers
         }
 
 
-        public IActionResult CustomerDetails(int id)
+        public IActionResult Details(int id)
         {
             Customer customer = Customer.CUSTOMERS.Find(c => c.Id == id);
             if (customer == null)
