@@ -1,0 +1,66 @@
+@model IEnumerable<Movie>
+@using System.Globalization
+
+<h1>Movie List</h1>
+
+<!-- Form for selecting month and year -->
+<form method="get" id="filterForm">
+    <label for="month">Month:</label>
+    <select id="month" name="month" required>
+        @for (int i = 1; i <= 12; i++)
+        {
+            <option value="@i">@CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i)</option>
+        }
+    </select>
+
+    <label for="year">Year:</label>
+    <input type="number" id="year" name="year" min="1900" max="2100" required />
+
+    <button type="submit">Filter</button>
+    <button type="button" id="resetButton">Remove Search</button>
+</form>
+
+<table class="movie-table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Release Date</th>
+            <th>Genre</th>
+            <th>Price</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var movie in Model)
+        {
+            <tr>
+                <td>@movie.ID</td>
+                <td>
+                    <a href="/movie/@movie.ID">@movie.Title</a>
+                </td>
+                <td>@movie.ReleaseDate.ToShortDateString()</td>
+                <td>@movie.Genre</td>
+                <td>@movie.Price.ToString("C")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- JavaScript to handle form submission and reset -->
+<script>
+    document.getElementById('filterForm').onsubmit = function (event) {
+        event.preventDefault(); // Prevent default form submission
+
+        const month = document.getElementById('month').value;
+        const year = document.getElementById('year').value;
+
+        // Redirect to the new URL format
+        window.location.href = `/movie/released/${year}/${month}`;
+    };
+
+    // Handle the reset button click
+    document.getElementById('resetButton').onclick = function () {
+        // Redirect to the original movie list page
+        window.location.href = '/movie'; // Adjust the URL if needed
+    };
+</script>
