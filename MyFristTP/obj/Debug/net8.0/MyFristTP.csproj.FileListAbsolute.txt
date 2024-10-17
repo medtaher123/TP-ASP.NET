@@ -28,3 +28,4 @@
 /home/mtbh/work/fac/dotnet/MyFristTP/obj/Debug/net8.0/MyFristTP.pdb
 /home/mtbh/work/fac/dotnet/MyFristTP/obj/Debug/net8.0/MyFristTP.genruntimeconfig.cache
 /home/mtbh/work/fac/dotnet/MyFristTP/obj/Debug/net8.0/ref/MyFristTP.dll
+/home/mtbh/work/fac/dotnet/MyFristTP/obj/Debug/net8.0/MyFristTP.sourcelink.json

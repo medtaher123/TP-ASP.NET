@@ -10,12 +10,19 @@ namespace MyFirstTP.Controllers
     {
 
         private static MovieList movies = new MovieList();
+        private static List<Customer> customers = new List<Customer>
+    {
+        new Customer { Id = 1, Name = "Alice" },
+        new Customer { Id = 2, Name = "Bob" },
+        new Customer { Id = 3, Name = "Charlie" }
+    };
 
 
         [HttpGet]
         public IActionResult Index()
         {
             return View(movies.All());
+
         }
 
         [HttpGet("{id}")]
@@ -54,6 +61,16 @@ namespace MyFirstTP.Controllers
 
             return View("index", movies.Released(year, month));
         }
+
+        [HttpGet("customers/{MovieId:int}")]
+        public IActionResult Customers(int MovieId)
+        {
+            Movie movie = movies.Find(MovieId);
+            if (movie == null)
+                return Content("Movie not found");
+
+            return Content(new MovieCustomerViewModel(movie, customers).ToString());
+
+        }
     }
 }
-// Compare this snippet from Startup.cs:
