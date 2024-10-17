@@ -1,0 +1,32 @@
+@model IEnumerable<MyFristTP.Models.Customer>
+@using System.Globalization
+
+<h1>Liste des Clients</h1>
+
+<table class="movie-table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nom</th>
+            <th>Email</th>
+            <th>Numéro de Téléphone</th>
+            <th>Adresse</th>
+            <th>Date d'Inscription</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var customer in Model)
+        {
+            <tr>
+                <td>@customer.Id</td>
+                <td>
+                    <a href="/customer/CustomerDetails/@customer.Id">@customer.Name</a>
+                </td>
+                <td>@customer.Email</td>
+                <td>@customer.PhoneNumber</td>
+                <td>@customer.Address</td>
+                <td>@customer.RegistrationDate.ToShortDateString()</td>
+            </tr>
+        }
+    </tbody>
+</table>

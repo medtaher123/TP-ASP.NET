@@ -1,29 +1,30 @@
-## Systèmes de Routage dans ASP.NET Core
+## Systèmes de Routage dans ASP.NET Core (Version la plus récente)
 
-ASP.NET Core propose plusieurs méthodes de routage pour diriger les requêtes HTTP vers les contrôleurs appropriés. Les principaux types de routage sont le **routage conventionnel** , le **routage par attribut** et le **routage mixte** .
+ASP.NET Core offre plusieurs approches pour gérer le routage des requêtes HTTP vers les contrôleurs appropriés. Les trois principaux types de routage sont : **routage conventionnel** , **routage par attribut** et **routage mixte** .
 
 ### 1. Routage Conventionnel
 
-Le routage conventionnel repose sur des conventions prédéfinies pour créer des routes à partir des noms de contrôleurs et des actions. Ce type de routage est généralement défini dans la classe `Startup.cs`, où l'on configure les modèles de routage.**Exemple de configuration :**
+Le **routage conventionnel** s'appuie sur des conventions pour définir les routes en fonction des noms de contrôleurs et d'actions. Dans la version la plus récente d'ASP.NET Core, le routage est défini via `MapControllerRoute` dans le fichier `Program.cs`.
+Voici un exemple de configuration pour un routage conventionnel dans ASP.NET Core 6.0+ :
 
 ```csharp
-public void Configure(IApplicationBuilder app, IHostingEnvironment env)
-{
-    app.UseMvc(routes =>
-    {
-        routes.MapRoute(
-            name: "default",
-            template: "{controller=Home}/{action=Index}/{id?}");
-    });
-}
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllersWithViews();
+var app = builder.Build();
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.Run();
 ```
 
-Dans ce cas, les routes sont généralement formées comme : `/NomDuContrôleur/NomDeLAction/Id`. Par exemple, une requête à `/Movie/Details/1` invoquerait l'action `Details` dans le contrôleur `Movie` avec `1` comme paramètre.
+Dans ce cas, une requête à `/Movie/Details/1` serait dirigée vers l'action `Details` du contrôleur `Movie`, avec `1` comme paramètre `id`. Les routes suivent le modèle : `/NomDuContrôleur/NomDeLAction/Id`.
 
 ### 2. Routage par Attribut
 
-Le routage par attribut utilise des annotations directement au-dessus des méthodes d'action pour définir les routes. Cela permet de lier explicitement chaque action à son URL.
-**Exemple :**
+Le **routage par attribut** permet d'associer directement les actions aux routes à l'aide d'annotations au-dessus des méthodes d'action. Cela offre plus de flexibilité et de contrôle sur les URLs, permettant de définir des routes personnalisées pour chaque action.**Exemple :**
 
 ```csharp
 [Route("movies")]
@@ -43,26 +44,29 @@ public class MovieController : Controller
 }
 ```
 
-Les routes sont directement liées aux méthodes, et peuvent inclure des paramètres de manière intuitive.
+Dans cet exemple, la route `/movies/1` accéderait directement à l’action `GetMovie` avec l’ID passé comme paramètre.
 
 ### 3. Routage Mixte
 
-Le routage mixte combine les deux approches précédentes, permettant d'utiliser à la fois le routage conventionnel et le routage par attribut dans une même application.
-**Exemple de configuration :**
+Le **routage mixte** combine le routage conventionnel et le routage par attribut, permettant aux développeurs d'utiliser l'une ou l'autre des approches dans la même application selon les besoins.
+Voici comment le configurer dans une application ASP.NET Core 6.0+ :
 
 ```csharp
-public void Configure(IApplicationBuilder app, IHostingEnvironment env)
-{
-    app.UseMvc(routes =>
-    {
-        routes.MapRoute(
-            name: "default",
-            template: "{controller=Home}/{action=Index}/{id?}");
+var builder = WebApplication.CreateBuilder(args);
 
-        // Ajout de routes par attribut
-        routes.MapMvcAttributeRoutes();
-    });
-}
+builder.Services.AddControllersWithViews();
+var app = builder.Build();
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+// Les routes avec des attributs sont automatiquement prises en charge
+app.Run();
 ```
 
-Cela permet aux développeurs de choisir la méthode de routage la plus appropriée pour chaque situation. Les routes complexes peuvent être gérées via le routage par attribut, tandis que les routes simples peuvent suivre la convention standard.
+Dans ce modèle, vous pouvez définir des routes conventionnelles tout en ajoutant des routes personnalisées via des attributs au niveau des contrôleurs ou des actions. Cela permet d’utiliser des routes simples avec la convention standard, tout en profitant du routage par attribut pour des cas plus spécifiques ou complexes.
+
+### Conclusion
+
+Avec ASP.NET Core 6.0 et les versions suivantes, le **routage conventionnel** est défini à l’aide de `MapControllerRoute`, offrant une approche simple et efficace pour gérer les routes dans une application. Pour les scénarios où vous avez besoin d'un contrôle plus précis sur les routes, vous pouvez utiliser le **routage par attribut** ou un mélange des deux avec le **routage mixte** .Le fichier `Program.cs` dans ASP.NET Core 6.0 est maintenant beaucoup plus simple, consolidant les configurations du pipeline dans un seul endroit, rendant la gestion des routes plus claire et intuitive.

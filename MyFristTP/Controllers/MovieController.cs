@@ -11,11 +11,35 @@ namespace MyFirstTP.Controllers
 
         private static MovieList movies = new MovieList();
         private static List<Customer> customers = new List<Customer>
+{
+    new Customer
     {
-        new Customer { Id = 1, Name = "Alice" },
-        new Customer { Id = 2, Name = "Bob" },
-        new Customer { Id = 3, Name = "Charlie" }
-    };
+        Id = 1,
+        Name = "Alice",
+        Email = "alice@example.com",
+        PhoneNumber = "123-456-7890",
+        Address = "123 Main St, Anytown, USA",
+        RegistrationDate = new DateTime(2023, 1, 15)
+    },
+    new Customer
+    {
+        Id = 2,
+        Name = "Bob",
+        Email = "bob@example.com",
+        PhoneNumber = "987-654-3210",
+        Address = "456 Elm St, Anytown, USA",
+        RegistrationDate = new DateTime(2023, 2, 20)
+    },
+    new Customer
+    {
+        Id = 3,
+        Name = "Charlie",
+        Email = "charlie@example.com",
+        PhoneNumber = "555-555-5555",
+        Address = "789 Oak St, Anytown, USA",
+        RegistrationDate = new DateTime(2023, 3, 10)
+    }
+};
 
 
         [HttpGet]
