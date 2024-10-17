@@ -9,7 +9,7 @@ namespace MyFirstTP.Controllers
     public class CustomerController : Controller
     {
 
-        public IActionResult Index(int MovieId)
+        public IActionResult Index()
         {
             return View(Customer.CUSTOMERS);
         }
