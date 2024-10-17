@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MyFristTP")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+68fbaa3a9795005c7156ad90eecea0fc2275bf94")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9783314ac0397a221457eb9688dde3d98b3482e9")]
 [assembly: System.Reflection.AssemblyProductAttribute("MyFristTP")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MyFristTP")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
