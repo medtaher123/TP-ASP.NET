@@ -1,0 +1,30 @@
+@model TP2.Models.Genre
+
+@{
+    ViewData["Title"] = "Edit Genre";
+}
+
+<h2>Edit Genre</h2>
+
+<form asp-action="Edit">
+    <div class="form-group">
+        <label asp-for="Name"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <input type="hidden" asp-for="Id" />
+    </br>
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>
+
+</br>
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
