@@ -1,0 +1,14 @@
+# Ignore build output folders
+**/bin/
+**/obj/
+
+# Ignore Visual Studio and Visual Studio Code folders
+.vs/
+.vscode/
+.idea/
+
+# Ignore test results
+**/TestResults/
+
+# Ignore packages folder for NuGet
+packages/
