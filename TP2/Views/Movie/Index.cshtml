@@ -15,6 +15,7 @@
         <tr>
             <th>Id</th>
             <th>Name</th>
+            <th>Genre</th>
             <th></th>
         </tr>
     </thead>
@@ -24,6 +25,7 @@
             <tr>
                 <td>@movie.Id</td>
                 <td>@movie.Name</td>
+                <td>@movie.Genre.Name</td>
                 <td>
                     <a class="btn btn-info" asp-controller="Movie" asp-action="Edit" asp-route-id="@movie.Id">Edit</a>
                     <a class="btn btn-danger" asp-controller="Movie" asp-action="Delete" asp-route-id="@movie.Id">Delete</a>

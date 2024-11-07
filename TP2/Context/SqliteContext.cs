@@ -14,6 +14,15 @@ public class SqliteContext : DbContext
     {
         //optionsBuilder.UseSqlite("Data Source=tp2.db");
     }
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Movie>()
+            .HasOne(m => m.Genre)
+            .WithMany(g => g.Movies)
+            .HasForeignKey(m => m.GenreId);
+
+        base.OnModelCreating(modelBuilder);
+    }
 
 }
 
