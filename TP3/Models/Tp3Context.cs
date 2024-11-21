@@ -23,9 +23,9 @@ public partial class Tp3Context : DbContext
 
     public virtual DbSet<Movie> Movies { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlite("Data Source=./Database/tp3.db");
+//     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+// #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+//         => optionsBuilder.UseSqlite("Data Source=./Database/tp3.db");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -72,6 +72,39 @@ public partial class Tp3Context : DbContext
             entity.HasOne(d => d.Genre).WithMany(p => p.Movies).HasForeignKey(d => d.GenreId);
         });
 
+        // Seed Membershiptype
+        modelBuilder.Entity<Membershiptype>().HasData(
+            new Membershiptype { Id = 1, DurationInMonth = 6, DiscountRate = 10, SignUpFee = 50 },
+            new Membershiptype { Id = 2, DurationInMonth = 12, DiscountRate = 20, SignUpFee = 100 }
+        );
+
+        // Seed Genre
+        modelBuilder.Entity<Genre>().HasData(
+            new Genre { Id = 1, GenreName = "Action" },
+            new Genre { Id = 2, GenreName = "Comedy" },
+            new Genre { Id = 3, GenreName = "Drama" }
+        );
+
+        // Seed Movies
+        modelBuilder.Entity<Movie>().HasData(
+            new Movie { Id = 1, GenreId = 1, Name = "Movie 1" },
+            new Movie { Id = 2, GenreId = 2, Name = "Movie 2" },
+            new Movie { Id = 3, GenreId = 3, Name = "Movie 3" }
+        );
+
+        // Seed Customers
+        modelBuilder.Entity<Customer>().HasData(
+            new Customer { Id = 1, Name = "Customer1", MembershiptypeId = 1 },
+            new Customer { Id = 2, Name = "Customer2", MembershiptypeId = 2 }
+        );
+
+        // Seed the Customer-Movie Many-to-Many Relationship
+        modelBuilder.Entity("CustomerMovie").HasData(
+            new { CustomerId = 1, MovieId = 1 },
+            new { CustomerId = 1, MovieId = 2 },
+            new { CustomerId = 2, MovieId = 2 }
+        );
+    
         OnModelCreatingPartial(modelBuilder);
     }
 
