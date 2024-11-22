@@ -1,0 +1,47 @@
+@model IEnumerable<TP4.Models.Customer>
+
+@{
+    ViewData["Title"] = "Customer List";
+}
+
+<h2>Customer List</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create New</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Discount Rate</th>
+            <th>Membership Type</th>
+            <th>Movies</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var customer in Model)
+        {
+            <tr>
+                <td>@customer.Name</td>
+                <td>@customer.Membershiptype?.Name</td>  <!-- Access Name from Membershiptype -->
+                <td>@customer.Membershiptype?.DiscountRate</td>  <!-- Access DiscountRate from Membershiptype -->
+                <td>
+                    @foreach (var movie in customer.Movies)
+                    {
+                        <span>@movie.Name</span><br />
+                    }
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@customer.Id" class="btn btn-warning">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@customer.Id" class="btn btn-info">Details</a> |
+                     <form asp-action="Delete" asp-route-id="@customer.Id" method="post" style="display:inline;">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

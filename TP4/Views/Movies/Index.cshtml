@@ -1,0 +1,51 @@
+@model IEnumerable<TP4.Models.Movie>
+
+@{
+    ViewData["Title"] = "Movies List";
+}
+
+<h2>Movies List</h2>
+<p>This is a list of all the movies in MVC Movies database.</p>
+<!-- Button to create a new movie -->
+<a asp-action="Create" class="btn btn-primary mb-3">Create new</a>
+
+<!-- Display the list of movies -->
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Genre</th>
+            <th>Date Released</th>
+            <th>Image</th> <!-- Add an Image column header -->
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var movie in Model)
+        {
+            <tr>
+                <td>@movie.Name</td>
+                <td>@movie.Genre.GenreName</td>
+                <td>@movie.ReleaseDate.ToString("d")</td>
+                <td>
+                    @if (!string.IsNullOrEmpty(movie.ImagePath))
+                    {
+                        <img src="@Url.Content(movie.ImagePath)" alt="@movie.Name" style="max-width: 100px; max-height: 100px;" />
+                    }
+                    else
+                    {
+                        <span>No Image</span>
+                    }
+                </td>
+                <td>
+                    <!-- You can add links for editing or deleting movies here -->
+                    <a asp-action="Edit" asp-route-id="@movie.Id" class="btn btn-warning btn-sm">Edit</a>
+                   <form asp-action="Delete" asp-route-id="@movie.Id" method="post" style="display:inline;">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
