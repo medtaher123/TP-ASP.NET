@@ -23,15 +23,16 @@ public partial class Tp3Context : DbContext
 
     public virtual DbSet<Movie> Movies { get; set; }
 
-//     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-// #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-//         => optionsBuilder.UseSqlite("Data Source=./Database/tp3.db");
+    // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        // => optionsBuilder.UseSqlite("Data Source=./Database/tp3.db");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Customer>(entity =>
         {
-            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.Name).IsRequired();
             entity.Property(e => e.MembershiptypeId).HasColumnName("membershiptype_id");
 
             entity.HasOne(d => d.Membershiptype).WithMany(p => p.Customers).HasForeignKey(d => d.MembershiptypeId);
@@ -54,55 +55,68 @@ public partial class Tp3Context : DbContext
 
         modelBuilder.Entity<Genre>(entity =>
         {
-            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
         });
 
         modelBuilder.Entity<Membershiptype>(entity =>
         {
-            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
             entity.Property(e => e.DiscountRate).HasColumnType("NUMERIC");
             entity.Property(e => e.SignUpFee).HasColumnType("NUMERIC");
         });
 
         modelBuilder.Entity<Movie>(entity =>
         {
-            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
             entity.Property(e => e.GenreId).HasColumnName("genre_id");
+            entity.Property(e => e.ReleaseDate).HasColumnType("datetime");
+            entity.Property(e => e.ImagePath).HasMaxLength(255);               
 
             entity.HasOne(d => d.Genre).WithMany(p => p.Movies).HasForeignKey(d => d.GenreId);
         });
-
+        Guid m1 = Guid.NewGuid();
+        Guid m2 = Guid.NewGuid();
         // Seed Membershiptype
         modelBuilder.Entity<Membershiptype>().HasData(
-            new Membershiptype { Id = 1, DurationInMonth = 6, DiscountRate = 10, SignUpFee = 50 },
-            new Membershiptype { Id = 2, DurationInMonth = 12, DiscountRate = 20, SignUpFee = 100 }
+            new Membershiptype { Id = m1, Name = "Basic", DurationInMonth = 6, DiscountRate = 10, SignUpFee = 50 },
+            new Membershiptype { Id = m2, Name = "Premium", DurationInMonth = 12, DiscountRate = 20, SignUpFee = 100 }
         );
+
+        Guid g1 = Guid.NewGuid();
+        Guid g2 = Guid.NewGuid();
+        Guid g3 = Guid.NewGuid();
 
         // Seed Genre
         modelBuilder.Entity<Genre>().HasData(
-            new Genre { Id = 1, GenreName = "Action" },
-            new Genre { Id = 2, GenreName = "Comedy" },
-            new Genre { Id = 3, GenreName = "Drama" }
+            new Genre { Id = g1, GenreName = "Action" },
+            new Genre { Id = g2, GenreName = "Comedy" },
+            new Genre { Id = g3, GenreName = "Drama" }
         );
 
+        Guid mv1 = Guid.NewGuid();
+        Guid mv2 = Guid.NewGuid();
+        Guid mv3 = Guid.NewGuid();
         // Seed Movies
         modelBuilder.Entity<Movie>().HasData(
-            new Movie { Id = 1, GenreId = 1, Name = "Movie 1" },
-            new Movie { Id = 2, GenreId = 2, Name = "Movie 2" },
-            new Movie { Id = 3, GenreId = 3, Name = "Movie 3" }
+            new Movie { Id = mv1, GenreId = g1, Name = "Movie 1", ReleaseDate = DateTime.Now.AddMonths(-3)},
+            new Movie { Id = mv2, GenreId = g2, Name = "Movie 2", ReleaseDate = DateTime.Now.AddMonths(-1)},
+            new Movie { Id = mv3, GenreId = g3, Name = "Movie 3", ReleaseDate = DateTime.Now }
+
         );
 
+        Guid c1 = Guid.NewGuid();
+        Guid c2 = Guid.NewGuid();
         // Seed Customers
         modelBuilder.Entity<Customer>().HasData(
-            new Customer { Id = 1, Name = "Customer1", MembershiptypeId = 1 },
-            new Customer { Id = 2, Name = "Customer2", MembershiptypeId = 2 }
+            new Customer { Id = c1, Name = "Customer1", MembershiptypeId = m1 },
+            new Customer { Id = c2, Name = "Customer2", MembershiptypeId = m2 }
         );
 
         // Seed the Customer-Movie Many-to-Many Relationship
         modelBuilder.Entity("CustomerMovie").HasData(
-            new { CustomerId = 1, MovieId = 1 },
-            new { CustomerId = 1, MovieId = 2 },
-            new { CustomerId = 2, MovieId = 2 }
+            new { CustomerId = c1, MovieId = mv1 },
+            new { CustomerId = c1, MovieId = mv2 },
+            new { CustomerId = c2, MovieId = mv2 }
         );
     
         OnModelCreatingPartial(modelBuilder);

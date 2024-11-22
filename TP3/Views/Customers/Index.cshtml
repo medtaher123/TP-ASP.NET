@@ -25,6 +25,7 @@
         {
             <tr>
                 <td>@customer.Name</td>
+                <td>@customer.Membershiptype?.Name</td>  <!-- Access Name from Membershiptype -->
                 <td>@customer.Membershiptype?.DiscountRate</td>  <!-- Access DiscountRate from Membershiptype -->
                 <td>
                     @foreach (var movie in customer.Movies)
@@ -35,7 +36,10 @@
                 <td>
                     <a asp-action="Edit" asp-route-id="@customer.Id" class="btn btn-warning">Edit</a> |
                     <a asp-action="Details" asp-route-id="@customer.Id" class="btn btn-info">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@customer.Id" class="btn btn-danger">Delete</a>
+                     <form asp-action="Delete" asp-route-id="@customer.Id" method="post" style="display:inline;">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
                 </td>
             </tr>
         }
