@@ -5,11 +5,11 @@ namespace TP3.Models;
 
 public partial class Customer
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
 
-    public string? Name { get; set; }
+    public string Name { get; set; }
 
-    public int? MembershiptypeId { get; set; }
+    public Guid? MembershiptypeId { get; set; }
 
     public virtual Membershiptype? Membershiptype { get; set; }
 

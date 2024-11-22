@@ -5,11 +5,15 @@ namespace TP3.Models;
 
 public partial class Movie
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
 
     public string? Name { get; set; }
 
-    public int? GenreId { get; set; }
+    public DateTime ReleaseDate { get; set; }  // Date de sortie du film
+        
+    public string? ImagePath { get; set; }  // Path to the image file
+
+    public Guid? GenreId { get; set; }
 
     public virtual Genre? Genre { get; set; }
 

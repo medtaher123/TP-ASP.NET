@@ -5,7 +5,7 @@ namespace TP3.Models;
 
 public partial class Genre
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
 
     public string? GenreName { get; set; }
 
