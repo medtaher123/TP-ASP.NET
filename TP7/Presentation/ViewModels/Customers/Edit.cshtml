@@ -1,0 +1,45 @@
+@model TP7.Domain.Entities.Customer
+
+@{
+    ViewData["Title"] = "Edit Customer";
+}
+
+<h2>Edit Customer</h2>
+
+<form asp-action="Edit" method="post" class="form-horizontal">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="form-group">
+        <label asp-for="Name" class="control-label">Name</label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="MembershiptypeId" class="control-label">Membership Type</label>
+        <select asp-for="MembershiptypeId" class="form-control" asp-items="ViewBag.MembershipTypes"></select>
+        <span asp-validation-for="MembershiptypeId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label">Movies</label>
+        <div>
+            @foreach (var movie in ViewBag.MovieList as List<SelectListItem>)
+            {
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" name="selectedMovies" value="@movie.Value" @(movie.Selected ? "checked" : "") />
+                    <label class="form-check-label">@movie.Text</label>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

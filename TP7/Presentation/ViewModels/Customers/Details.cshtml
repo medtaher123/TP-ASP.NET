@@ -1,0 +1,59 @@
+@model TP7.Domain.Entities.Customer
+
+@{
+    ViewData["Title"] = "Customer Details";
+}
+
+<h2>Customer Details</h2>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <h4 class="card-title">@Model.Name</h4>
+        <p class="card-text"><strong>Membership Type:</strong> @Model.Membershiptype.Name</p>
+    </div>
+</div>
+
+<h3>Associated Movies</h3>
+@if (Model.Movies.Any())
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Movie Name</th>
+                <th>Genre</th>
+                <th>Release Date</th>
+                <th>Image</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var movie in Model.Movies)
+            {
+                <tr>
+                    <td>@movie.Name</td>
+                    <td>@movie.Genre.GenreName</td>
+                    <td>@movie.ReleaseDate.ToString("d")</td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(movie.ImagePath))
+                        {
+                            <img 
+                            src="@Url.Content(movie.ImagePath)" 
+                            alt="@movie.Name" 
+                            style="max-width: 100px; max-height: 100px;"
+                            />
+                        }
+                        else
+                        {
+                            <span>No Image</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No movies associated with this customer.</p>
+}
+
+<a asp-action="Index" class="btn btn-secondary">Back to Customers List</a>
