@@ -39,7 +39,7 @@
                 </td>
                 <td>
                     <!-- You can add links for editing or deleting movies here -->
-                    <a asp-action="Edit" asp-route-id="@movie.Id" class="btn btn-warning btn-sm">Edit</a>
+                    <a asp-action="Edit" asp-route-id="@movie.Id" class="btn btn-warning btn-sm">Edit</a> |
                    <form asp-action="Delete" asp-route-id="@movie.Id" method="post" style="display:inline;">
                         @Html.AntiForgeryToken()
                         <button type="submit" class="btn btn-danger btn-sm">Delete</button>
