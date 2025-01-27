@@ -8,6 +8,7 @@ namespace ChronoLink.Data
     {
         // DbSet properties for each entity
         public DbSet<Workspace> Workspaces { get; set; }
+        public DbSet<WorkspaceUser> WorkspaceUsers { get; set; }
         public DbSet<Calendar> Calendars { get; set; }
         public DbSet<Event> Events { get; set; }
         public DbSet<QuestionResponse> QuestionResponses { get; set; }

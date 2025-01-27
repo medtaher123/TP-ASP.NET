@@ -1,10 +1,12 @@
 using System.Security.Claims;
 using ChronoLink.Models;
 using ChronoLink.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChronoLink.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class QuestionsController : ControllerBase

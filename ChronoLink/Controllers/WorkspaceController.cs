@@ -1,21 +1,30 @@
-using System.Security.Claims;
 using ChronoLink.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChronoLink.Controllers
 {
-    [Route("api/workspace/{workspaceId}/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     [Authorize]
-    public class UsersController : ControllerBase
+    public class WorkspaceController : ControllerBase
     {
-        [HttpPost("{userId}/promote")]
+        [HttpPut("{workspaceId}")]
         [Authorize(Policy = "WorkspaceAdmin")]
-        public IActionResult PromoteUser(int workspaceId, string userId)
+        public IActionResult UpdateWorkspace(int workspaceId, [FromBody] Workspace workspace)
         {
-            // Logic to promote user to admin
-            return Ok(new { Message = "User promoted to admin" });
+            // Only users with the "Admin" role in this workspace can access this endpoint
+            // Your logic here
+            return Ok();
+        }
+
+        [HttpGet("{workspaceId}/calendar")]
+        [Authorize(Policy = "WorkspaceViewer")]
+        public IActionResult GetWorkspaceCalendar(int workspaceId)
+        {
+            // Only users with the "Viewer" or "Admin" role in this workspace can access this endpoint
+            // Your logic here
+            return Ok();
         }
     }
 }

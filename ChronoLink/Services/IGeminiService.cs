@@ -2,6 +2,6 @@ namespace ChronoLink.Services
 {
     public interface IGeminiService
     {
-        string AskGemini(string prompt, string question);
+        Task<string> AskGeminiAsync(string prompt, string question);
     }
 }

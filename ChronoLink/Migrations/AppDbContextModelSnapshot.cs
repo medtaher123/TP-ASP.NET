@@ -201,14 +201,15 @@ namespace ChronoLink.Migrations
                     b.Property<int>("WorkspaceId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<bool>("IsAdmin")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.HasKey("UserId", "WorkspaceId");
 
                     b.HasIndex("WorkspaceId");
 
-                    b.ToTable("WorkspaceUser");
+                    b.ToTable("WorkspaceUsers");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

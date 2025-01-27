@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ChronoLink.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250126220050_InitialCreate")]
+    [Migration("20250127152005_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -204,14 +204,15 @@ namespace ChronoLink.Migrations
                     b.Property<int>("WorkspaceId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<bool>("IsAdmin")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.HasKey("UserId", "WorkspaceId");
 
                     b.HasIndex("WorkspaceId");
 
-                    b.ToTable("WorkspaceUser");
+                    b.ToTable("WorkspaceUsers");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

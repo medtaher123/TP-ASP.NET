@@ -232,24 +232,24 @@ namespace ChronoLink.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "WorkspaceUser",
+                name: "WorkspaceUsers",
                 columns: table => new
                 {
                     UserId = table.Column<string>(type: "TEXT", nullable: false),
                     WorkspaceId = table.Column<int>(type: "INTEGER", nullable: false),
-                    IsAdmin = table.Column<bool>(type: "INTEGER", nullable: false)
+                    Role = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_WorkspaceUser", x => new { x.UserId, x.WorkspaceId });
+                    table.PrimaryKey("PK_WorkspaceUsers", x => new { x.UserId, x.WorkspaceId });
                     table.ForeignKey(
-                        name: "FK_WorkspaceUser_AspNetUsers_UserId",
+                        name: "FK_WorkspaceUsers_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_WorkspaceUser_Workspaces_WorkspaceId",
+                        name: "FK_WorkspaceUsers_Workspaces_WorkspaceId",
                         column: x => x.WorkspaceId,
                         principalTable: "Workspaces",
                         principalColumn: "Id",
@@ -347,8 +347,8 @@ namespace ChronoLink.Migrations
                 column: "AdminId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_WorkspaceUser_WorkspaceId",
-                table: "WorkspaceUser",
+                name: "IX_WorkspaceUsers_WorkspaceId",
+                table: "WorkspaceUsers",
                 column: "WorkspaceId");
         }
 
@@ -377,7 +377,7 @@ namespace ChronoLink.Migrations
                 name: "QuestionResponses");
 
             migrationBuilder.DropTable(
-                name: "WorkspaceUser");
+                name: "WorkspaceUsers");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

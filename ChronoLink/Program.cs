@@ -1,9 +1,11 @@
 using System.Text;
+using ChronoLink.Authorization;
 using ChronoLink.Data;
 using ChronoLink.Models;
 using ChronoLink.Repositories;
 using ChronoLink.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -32,6 +34,9 @@ builder.Services.AddScoped<IQuestionResponseRepository, QuestionResponseReposito
 builder.Services.AddScoped<IGeminiService, GeminiService>();
 builder.Services.AddScoped<IQuestionService, QuestionService>();
 
+// Register authorization services
+builder.Services.AddScoped<IAuthorizationHandler, WorkspaceRoleHandler>();
+
 // Configure JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 builder
@@ -59,7 +64,15 @@ builder
 // Add authorization policies
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("WorkspaceAdmin", policy => policy.RequireClaim("WorkspaceAdmin", "true"));
+    options.AddPolicy(
+        "WorkspaceAdmin",
+        policy => policy.Requirements.Add(new WorkspaceRoleRequirement("Admin"))
+    );
+
+    options.AddPolicy(
+        "WorkspaceViewer",
+        policy => policy.Requirements.Add(new WorkspaceRoleRequirement("Viewer"))
+    );
 });
 
 // Add swagger
@@ -118,6 +131,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

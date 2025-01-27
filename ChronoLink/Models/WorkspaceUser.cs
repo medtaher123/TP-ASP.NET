@@ -12,6 +12,6 @@ namespace ChronoLink.Models
         public Workspace Workspace { get; set; }
 
         [Required]
-        public bool IsAdmin { get; set; }
+        public string Role { get; set; }
     }
 }
