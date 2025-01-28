@@ -11,12 +11,6 @@ namespace ChronoLink.Models
         [MaxLength(100)]
         public string Name { get; set; } = string.Empty;
 
-        [Required]
-        public string AdminId { get; set; } = string.Empty;
-
-        [ForeignKey("AdminId")]
-        public User Admin { get; set; }
-
         public ICollection<WorkspaceUser> WorkspaceUsers { get; set; } = new List<WorkspaceUser>();
         public ICollection<Task> Tasks { get; set; } = new List<Task>();
     }

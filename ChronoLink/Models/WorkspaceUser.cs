@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ChronoLink.Models
 {
@@ -18,6 +18,13 @@ namespace ChronoLink.Models
         public Workspace Workspace { get; set; }
 
         [Required]
-        public string Role { get; set; } = string.Empty;
+        [Column(TypeName = "nvarchar(20)")]
+        public WorkspaceRole Role { get; set; } = WorkspaceRole.Member;
+    }
+
+    public enum WorkspaceRole
+    {
+        Admin,
+        Member,
     }
 }

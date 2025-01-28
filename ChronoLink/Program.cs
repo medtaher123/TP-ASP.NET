@@ -25,8 +25,6 @@ builder
     .AddDefaultTokenProviders();
 
 // Register repositories
-builder.Services.AddScoped<IRepository<Calendar>, Repository<Calendar>>();
-builder.Services.AddScoped<ICalendarRepository, CalendarRepository>();
 builder.Services.AddScoped<IRepository<QuestionResponse>, Repository<QuestionResponse>>();
 builder.Services.AddScoped<IQuestionResponseRepository, QuestionResponseRepository>();
 
@@ -35,7 +33,8 @@ builder.Services.AddScoped<IGeminiService, GeminiService>();
 builder.Services.AddScoped<IQuestionService, QuestionService>();
 
 // Register authorization services
-builder.Services.AddScoped<IAuthorizationHandler, WorkspaceRoleHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, WorkspaceAdminHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, WorkspaceMemberHandler>();
 
 // Configure JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
@@ -66,12 +65,12 @@ builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy(
         "WorkspaceAdmin",
-        policy => policy.Requirements.Add(new WorkspaceRoleRequirement("Admin"))
+        policy => policy.Requirements.Add(new WorkspaceAdminRequirement())
     );
 
     options.AddPolicy(
-        "WorkspaceViewer",
-        policy => policy.Requirements.Add(new WorkspaceRoleRequirement("Viewer"))
+        "WorkspaceMember",
+        policy => policy.Requirements.Add(new WorkspaceMemberRequirement())
     );
 });
 
