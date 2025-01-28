@@ -1,71 +1,84 @@
 using ChronoLink.Models;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Task = ChronoLink.Models.Task;
 
 namespace ChronoLink.Data
 {
-    public class AppDbContext : IdentityDbContext<User>
+    public class AppDbContext : DbContext
     {
-        // DbSet properties for each entity
         public DbSet<Workspace> Workspaces { get; set; }
+        public DbSet<User> Users { get; set; }
         public DbSet<WorkspaceUser> WorkspaceUsers { get; set; }
-        public DbSet<Calendar> Calendars { get; set; }
-        public DbSet<Event> Events { get; set; }
+        public DbSet<Task> Tasks { get; set; }
         public DbSet<QuestionResponse> QuestionResponses { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options) { }
 
-        // Configure relationships and constraints
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            // Configure many-to-many relationship for WorkspaceUser
-            modelBuilder.Entity<WorkspaceUser>().HasKey(wu => new { wu.UserId, wu.WorkspaceId });
 
+            // Configure WorkspaceUser as a many-to-many join table between User and Workspace
             modelBuilder
                 .Entity<WorkspaceUser>()
                 .HasOne(wu => wu.User)
                 .WithMany(u => u.WorkspaceUsers)
-                .HasForeignKey(wu => wu.UserId);
+                .HasForeignKey(wu => wu.UserId)
+                .OnDelete(DeleteBehavior.Cascade); // Delete WorkspaceUser if User is deleted
 
             modelBuilder
                 .Entity<WorkspaceUser>()
                 .HasOne(wu => wu.Workspace)
                 .WithMany(w => w.WorkspaceUsers)
-                .HasForeignKey(wu => wu.WorkspaceId);
+                .HasForeignKey(wu => wu.WorkspaceId)
+                .OnDelete(DeleteBehavior.Cascade); // Delete WorkspaceUser if Workspace is deleted
 
-            // Configure one-to-many relationship between User and Calendar (personal calendars)
+            // Configure Task entity
             modelBuilder
-                .Entity<Calendar>()
-                .HasOne(c => c.User)
-                .WithMany(u => u.PersonalCalendars)
-                .HasForeignKey(c => c.UserId)
-                .OnDelete(DeleteBehavior.Restrict); // Prevent cascade delete
+                .Entity<Task>()
+                .HasOne(t => t.WorkspaceUser)
+                .WithMany(wu => wu.Tasks)
+                .HasForeignKey(t => t.WorkspaceUserId)
+                .OnDelete(DeleteBehavior.Cascade); // Delete Task if WorkspaceUser is deleted
 
-            // Configure one-to-one relationship between Workspace and Calendar (shared calendar)
-            modelBuilder
-                .Entity<Workspace>()
-                .HasOne(w => w.SharedCalendar)
-                .WithOne(c => c.Workspace)
-                .HasForeignKey<Calendar>(c => c.WorkspaceId)
-                .OnDelete(DeleteBehavior.Cascade); // Delete shared calendar if workspace is deleted
-
-            // Configure one-to-many relationship between Calendar and Event
-            modelBuilder
-                .Entity<Event>()
-                .HasOne(e => e.Calendar)
-                .WithMany(c => c.Events)
-                .HasForeignKey(e => e.CalendarId)
-                .OnDelete(DeleteBehavior.Cascade); // Delete events if calendar is deleted
-
-            // Configure one-to-many relationship between User and QuestionResponse
+            // Configure QuestionResponse entity
             modelBuilder
                 .Entity<QuestionResponse>()
                 .HasOne(qr => qr.User)
                 .WithMany(u => u.QuestionResponses)
                 .HasForeignKey(qr => qr.UserId)
-                .OnDelete(DeleteBehavior.Cascade); // Delete question/responses if user is deleted
+                .OnDelete(DeleteBehavior.Cascade); // Delete QuestionResponse if User is deleted
+
+            // Configure User entity (IdentityUser)
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.Property(u => u.Name).HasMaxLength(100).IsRequired();
+
+                entity
+                    .HasMany(u => u.WorkspaceUsers)
+                    .WithOne(wu => wu.User)
+                    .HasForeignKey(wu => wu.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity
+                    .HasMany(u => u.QuestionResponses)
+                    .WithOne(qr => qr.User)
+                    .HasForeignKey(qr => qr.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // Configure Workspace entity
+            modelBuilder.Entity<Workspace>(entity =>
+            {
+                entity.Property(w => w.Name).HasMaxLength(100).IsRequired();
+
+                entity
+                    .HasMany(w => w.WorkspaceUsers)
+                    .WithOne(wu => wu.Workspace)
+                    .HasForeignKey(wu => wu.WorkspaceId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
         }
     }
 }

@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using ChronoLink.Models;
+using Task = ChronoLink.Models.Task;
 
 namespace ChronoLink.Validation
 {
@@ -15,9 +15,9 @@ namespace ChronoLink.Validation
                 return ValidationResult.Success;
             }
 
-            var eventModel = (Event)validationContext.ObjectInstance;
+            var taskModel = (Task)validationContext.ObjectInstance;
 
-            if (eventModel.EndDateTime <= eventModel.StartDateTime)
+            if (taskModel.EndDateTime <= taskModel.StartDateTime)
             {
                 return new ValidationResult("End date/time must be after the start date/time.");
             }

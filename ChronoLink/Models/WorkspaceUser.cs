@@ -5,6 +5,8 @@ namespace ChronoLink.Models
 {
     public class WorkspaceUser
     {
+        public int Id { get; set; }
+
         [Required]
         public string UserId { get; set; } = string.Empty;
 
@@ -20,6 +22,8 @@ namespace ChronoLink.Models
         [Required]
         [Column(TypeName = "nvarchar(20)")]
         public WorkspaceRole Role { get; set; } = WorkspaceRole.Member;
+
+        public ICollection<Task> Tasks { get; set; } = new List<Task>();
     }
 
     public enum WorkspaceRole

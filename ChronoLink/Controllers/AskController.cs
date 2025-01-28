@@ -16,21 +16,18 @@ namespace ChronoLink.Controllers
     public class AskController : ControllerBase
     {
         private readonly IGeminiService _geminiService;
-        private readonly ICalendarRepository _calendarRepository;
         private readonly IQuestionResponseRepository _questionResponseRepository;
         private readonly IAuthorizationService _authorizationService;
         private readonly UserManager<User> _userManager;
 
         public AskController(
             IGeminiService geminiService,
-            ICalendarRepository calendarRepository,
             IQuestionResponseRepository questionResponseRepository,
             IAuthorizationService authorizationService,
             UserManager<User> userManager
         )
         {
             _geminiService = geminiService;
-            _calendarRepository = calendarRepository;
             _questionResponseRepository = questionResponseRepository;
             _authorizationService = authorizationService;
             _userManager = userManager;
@@ -104,24 +101,25 @@ namespace ChronoLink.Controllers
             }
         }
 
+        // TOFIX: Implement the above logic to build the prompt
         private string BuildPrompt(string userId, int? workspaceId)
         {
-            var calendar = _calendarRepository.GetCalendar(userId, workspaceId);
-            if (calendar == null || calendar.Events == null || !calendar.Events.Any())
-            {
-                return "No events found in the calendar.";
-            }
+            // if (calendar == null || calendar.Events == null || !calendar.Events.Any())
+            // {
+            //     return "No events found in the calendar.";
+            // }
 
-            var prompt = new StringBuilder();
-            prompt.AppendLine("Calendar Events:");
-            foreach (var evt in calendar.Events)
-            {
-                prompt.AppendLine(
-                    $"{evt.Description} from {evt.StartDateTime} to {evt.EndDateTime}"
-                );
-            }
+            // var prompt = new StringBuilder();
+            // prompt.AppendLine("Calendar Events:");
+            // foreach (var evt in calendar.Events)
+            // {
+            //     prompt.AppendLine(
+            //         $"{evt.Description} from {evt.StartDateTime} to {evt.EndDateTime}"
+            //     );
+            // }
 
-            return prompt.ToString();
+            // return prompt.ToString();
+            return "Prompt";
         }
     }
 
