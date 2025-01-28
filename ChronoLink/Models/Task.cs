@@ -1,16 +1,15 @@
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using ChronoLink.Validation;
 
 namespace ChronoLink.Models
 {
-    public class Event
+    public class Task
     {
         public int Id { get; set; }
 
         [Required]
         [MaxLength(500)]
-        public string Description { get; set; }
+        public string Description { get; set; } = string.Empty;
 
         [Required]
         public DateTime StartDateTime { get; set; }
@@ -19,8 +18,10 @@ namespace ChronoLink.Models
         [EndDateTimeAfterStartDateTime]
         public DateTime EndDateTime { get; set; }
 
-        // Foreign key to Calendar
-        public int CalendarId { get; set; }
-        public Calendar Calendar { get; set; }
+        [Required]
+        public int WorkspaceUserId { get; set; }
+
+        [ForeignKey("WorkspaceUserId")]
+        public WorkspaceUser WorkspaceUser { get; set; }
     }
 }

@@ -9,14 +9,15 @@ namespace ChronoLink.Models
 
         [Required]
         [MaxLength(100)]
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
-        // Admin who created the workspace
+        [Required]
         public string AdminId { get; set; } = string.Empty;
+
+        [ForeignKey("AdminId")]
         public User Admin { get; set; }
 
-        // Navigation properties
         public ICollection<WorkspaceUser> WorkspaceUsers { get; set; } = new List<WorkspaceUser>();
-        public Calendar SharedCalendar { get; set; }
+        public ICollection<Task> Tasks { get; set; } = new List<Task>();
     }
 }
