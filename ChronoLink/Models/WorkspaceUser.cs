@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace ChronoLink.Models
 {
@@ -17,12 +18,14 @@ namespace ChronoLink.Models
         public int WorkspaceId { get; set; }
 
         [ForeignKey("WorkspaceId")]
+        [JsonIgnore]
         public Workspace Workspace { get; set; }
 
         [Required]
         [Column(TypeName = "nvarchar(20)")]
         public WorkspaceRole Role { get; set; } = WorkspaceRole.Member;
 
+        [JsonIgnore]
         public ICollection<Task> Tasks { get; set; } = new List<Task>();
     }
 

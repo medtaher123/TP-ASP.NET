@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using ChronoLink.Data;
+using ChronoLink.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,7 +10,7 @@ namespace ChronoLink.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize] // All endpoints require authentication
+    [Authorize]
     public class TasksController : ControllerBase
     {
         private readonly AppDbContext _dbContext;
@@ -54,7 +55,7 @@ namespace ChronoLink.Controllers
                     t.Description,
                     t.StartDateTime,
                     t.EndDateTime,
-                    WorkspaceId = t.WorkspaceUser.WorkspaceId,
+                    t.WorkspaceUser.WorkspaceId,
                     AssignedUserId = t.WorkspaceUser.UserId,
                     AssignedUserName = t.WorkspaceUser.User.Name,
                 })
@@ -98,7 +99,7 @@ namespace ChronoLink.Controllers
                     t.Description,
                     t.StartDateTime,
                     t.EndDateTime,
-                    WorkspaceId = t.WorkspaceUser.WorkspaceId,
+                    t.WorkspaceUser.WorkspaceId,
                 })
                 .ToListAsync();
 
@@ -107,22 +108,20 @@ namespace ChronoLink.Controllers
 
         // POST /api/tasks
         [HttpPost]
-        public async Task<IActionResult> CreateTask([FromBody] CreateTaskRequest request)
+        [Authorize(Policy = "WorkspaceAdmin")]
+        public async Task<IActionResult> CreateTask(
+            [FromQuery] int? workspace,
+            [FromBody] CreateTaskRequest request
+        )
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId))
-            {
-                return Unauthorized();
-            }
-
-            // Check if the user is a member of the workspace
-            var isMember = await _dbContext.WorkspaceUsers.AnyAsync(wu =>
-                wu.UserId == userId && wu.WorkspaceId == request.WorkspaceId
+            var workspaceUser = await _dbContext.WorkspaceUsers.FirstOrDefaultAsync(wu =>
+                wu.UserId == request.UserId && wu.WorkspaceId == workspace
             );
 
-            if (!isMember)
+            // Check if the user is a member of the workspace
+            if (workspaceUser == null)
             {
-                return Forbid();
+                return Forbid("The user is not a member of the workspace.");
             }
 
             // Create the task
@@ -131,7 +130,7 @@ namespace ChronoLink.Controllers
                 Description = request.Description,
                 StartDateTime = request.StartDateTime,
                 EndDateTime = request.EndDateTime,
-                WorkspaceUserId = request.WorkspaceUserId,
+                WorkspaceUserId = workspaceUser.Id,
             };
 
             _dbContext.Tasks.Add(task);
@@ -158,16 +157,23 @@ namespace ChronoLink.Controllers
             {
                 return NotFound();
             }
-
             // Check if the user is a member of the workspace
             var isMember = await _dbContext.WorkspaceUsers.AnyAsync(wu =>
-                wu.UserId == userId && wu.WorkspaceId == task.WorkspaceUser.WorkspaceId
+                wu.UserId == userId && wu.WorkspaceId == task.WorkspaceUserId
             );
 
             if (!isMember)
             {
                 return Forbid();
             }
+
+            var workspaceUser = await _dbContext.WorkspaceUsers.FirstOrDefaultAsync(wu =>
+                wu.Id == task.WorkspaceUserId
+            );
+
+            var userAssigned = await _dbContext.Users.FirstOrDefaultAsync(u =>
+                u.Id == workspaceUser.UserId
+            );
 
             return Ok(
                 new
@@ -176,9 +182,8 @@ namespace ChronoLink.Controllers
                     task.Description,
                     task.StartDateTime,
                     task.EndDateTime,
-                    WorkspaceId = task.WorkspaceUser.WorkspaceId,
-                    AssignedUserId = task.WorkspaceUser.UserId,
-                    AssignedUserName = task.WorkspaceUser.User.Name,
+                    AssignedUserId = userAssigned.Id,
+                    AssignedUserName = userAssigned.Name,
                 }
             );
         }
@@ -233,8 +238,7 @@ namespace ChronoLink.Controllers
         public string Description { get; set; }
         public DateTime StartDateTime { get; set; }
         public DateTime EndDateTime { get; set; }
-        public int WorkspaceId { get; set; }
-        public int WorkspaceUserId { get; set; }
+        public required string UserId { get; set; }
     }
 
     public class UpdateTaskRequest

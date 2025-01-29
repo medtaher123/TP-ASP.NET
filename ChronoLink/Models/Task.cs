@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 using ChronoLink.Validation;
 
 namespace ChronoLink.Models
@@ -19,10 +20,10 @@ namespace ChronoLink.Models
         [EndDateTimeAfterStartDateTime]
         public DateTime EndDateTime { get; set; }
 
-        [Required]
         public int WorkspaceUserId { get; set; }
 
         [ForeignKey("WorkspaceUserId")]
+        [JsonIgnore]
         public WorkspaceUser WorkspaceUser { get; set; }
     }
 }

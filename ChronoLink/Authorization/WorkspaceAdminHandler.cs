@@ -1,4 +1,6 @@
+using System.ComponentModel;
 using System.Security.Claims;
+using System.Text.Json;
 using ChronoLink.Data;
 using ChronoLink.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -30,16 +32,9 @@ namespace ChronoLink.Authorization
             {
                 return;
             }
-
-            // Get workspace ID from route or query parameter
-            var workspaceId =
-                httpContext.Request.RouteValues["workspaceId"]?.ToString()
-                ?? httpContext.Request.Query["workspace"].ToString();
-
-            if (
-                string.IsNullOrEmpty(workspaceId)
-                || !int.TryParse(workspaceId, out var workspaceIdInt)
-            )
+            // Try to extract workspaceId
+            var workspaceId = await TryGetWorkspaceId(httpContext);
+            if (!workspaceId.HasValue)
             {
                 return;
             }
@@ -54,7 +49,7 @@ namespace ChronoLink.Authorization
             // Query the database to check if the user is an admin for the workspace
             var isAdmin = await _dbContext.WorkspaceUsers.AnyAsync(wu =>
                 wu.UserId == userId
-                && wu.WorkspaceId == workspaceIdInt
+                && wu.WorkspaceId == workspaceId
                 && wu.Role == WorkspaceRole.Admin
             );
 
@@ -62,6 +57,45 @@ namespace ChronoLink.Authorization
             {
                 context.Succeed(requirement);
             }
+        }
+
+        private async Task<int?> TryGetWorkspaceId(HttpContext httpContext)
+        {
+            // 1. Check route parameters
+            if (
+                httpContext.Request.RouteValues.TryGetValue("workspaceId", out var routeValue)
+                && int.TryParse(routeValue?.ToString(), out var workspaceIdFromRoute)
+            )
+            {
+                return workspaceIdFromRoute;
+            }
+
+            // 2. Check query parameters
+            if (
+                httpContext.Request.Query.TryGetValue("workspace", out var queryValue)
+                && int.TryParse(queryValue, out var workspaceIdFromQuery)
+            )
+            {
+                return workspaceIdFromQuery;
+            }
+
+            // 3. Check if taskid is route parameter
+            if (
+                httpContext.Request.RouteValues.TryGetValue("taskId", out var taskValue)
+                && int.TryParse(taskValue?.ToString(), out var taskId)
+            )
+            {
+                var task = await _dbContext.Tasks.FindAsync(taskId);
+                if (task != null)
+                {
+                    var workspaceUser = await _dbContext.WorkspaceUsers.FirstOrDefaultAsync(wu =>
+                        wu.Id == task.WorkspaceUserId
+                    );
+                    return workspaceUser?.WorkspaceId;
+                }
+            }
+
+            return null;
         }
     }
 }

@@ -19,7 +19,6 @@ namespace ChronoLink.Models
         [Required]
         public bool IsFavourite { get; set; } = false;
 
-        // Optional: A response can exist without a workspace
         public int? WorkspaceId { get; set; }
 
         [ForeignKey("WorkspaceId")]

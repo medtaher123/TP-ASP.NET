@@ -62,7 +62,7 @@ namespace ChronoLink.Controllers
                     w.Name,
                     Members = w.WorkspaceUsers.Select(m => new
                     {
-                        m.UserId,
+                        m.Id,
                         m.User.Name,
                         m.Role,
                     }),
