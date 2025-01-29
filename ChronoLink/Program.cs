@@ -34,6 +34,7 @@ builder.Services.AddScoped<IQuestionService, QuestionService>();
 
 // Register authorization services
 builder.Services.AddScoped<IAuthorizationHandler, WorkspaceAdminHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, WorkspaceMemberHandler>();
 
 // Configure JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
@@ -65,6 +66,10 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy(
         "WorkspaceAdmin",
         policy => policy.Requirements.Add(new WorkspaceAdminRequirement())
+    );
+     options.AddPolicy(
+        "WorkspaceMember",
+        policy => policy.Requirements.Add(new WorkspaceMemberRequirement())
     );
 });
 
