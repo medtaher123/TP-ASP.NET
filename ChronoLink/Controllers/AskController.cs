@@ -19,18 +19,21 @@ namespace ChronoLink.Controllers
         private readonly IQuestionResponseRepository _questionResponseRepository;
         private readonly IAuthorizationService _authorizationService;
         private readonly UserManager<User> _userManager;
+        private readonly ITaskService _taskService;
 
         public AskController(
             IGeminiService geminiService,
             IQuestionResponseRepository questionResponseRepository,
             IAuthorizationService authorizationService,
-            UserManager<User> userManager
+            UserManager<User> userManager,
+            ITaskService taskService
         )
         {
             _geminiService = geminiService;
             _questionResponseRepository = questionResponseRepository;
             _authorizationService = authorizationService;
             _userManager = userManager;
+            _taskService = taskService;
         }
 
         [HttpPost]
@@ -73,7 +76,7 @@ namespace ChronoLink.Controllers
                 }
 
                 // Build the prompt and get the response from Gemini
-                var prompt = BuildPrompt(userId, request.WorkspaceId);
+                var prompt = await BuildPrompt(userId, request.WorkspaceId);
                 var response = await _geminiService.AskGeminiAsync(prompt, request.Question);
 
                 // Save the question and response
@@ -102,24 +105,20 @@ namespace ChronoLink.Controllers
         }
 
         // TOFIX: Implement the above logic to build the prompt
-        private string BuildPrompt(string userId, int? workspaceId)
+        private async Task<string> BuildPrompt(string userId, int? workspaceId)
         {
-            // if (calendar == null || calendar.Events == null || !calendar.Events.Any())
-            // {
-            //     return "No events found in the calendar.";
-            // }
-
-            // var prompt = new StringBuilder();
-            // prompt.AppendLine("Calendar Events:");
-            // foreach (var evt in calendar.Events)
-            // {
-            //     prompt.AppendLine(
-            //         $"{evt.Description} from {evt.StartDateTime} to {evt.EndDateTime}"
-            //     );
-            // }
-
-            // return prompt.ToString();
-            return "Prompt";
+           var prompt = "You are an expert at task management and you were asked to analyze some data and provide a response. " +
+                 "Do not answer any questions unrelated to the tasks, whenever an irrelevant question is asked, say that you're a " +
+                 "bot for task management and that the user can ask anything he wants about the tasks or get suggestions about tasks. " +
+                 "You are given the following data: \n";
+    var tasks = await _taskService.GetMyTasksAsync(userId, workspaceId);
+    foreach (var task in tasks)
+    {
+        prompt += $"Task: {task.Description}\n";
+        prompt += $"Start: {task.StartDateTime}\n";
+        prompt += $"End: {task.EndDateTime}\n";
+    }
+    return prompt;
         }
     }
 
