@@ -25,6 +25,12 @@ namespace ChronoLink.Controllers
             var questions = _questionService.GetQuestions(userId!);
             return Ok(questions);
         }
+        [HttpGet("{id}")]
+        public IActionResult GetQuestion(int id)
+        {
+            var question = _questionService.GetQuestion(id);
+            return Ok(question);
+        }
         [HttpGet("favourite")]
         public IActionResult GetFavouriteQuestions()
         {
@@ -46,6 +52,12 @@ namespace ChronoLink.Controllers
         {
             _questionService.RemoveFavourite(id);
             return Ok(new { Message = "Question removed from favourites" });
+        }
+        [HttpDelete("{id}")]
+        public IActionResult DeleteQuestion(int id)
+        {
+            _questionService.RemoveQuestion(id);
+            return Ok(new { Message = "Question removed" });
         }
     }
 }

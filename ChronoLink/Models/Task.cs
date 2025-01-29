@@ -14,12 +14,9 @@ namespace ChronoLink.Models
         public string Description { get; set; } = string.Empty;
 
         [Required]
-        [DateTime]
-        [StartDateTimeBeforeEndDateTime]
         public DateTime StartDateTime { get; set; }
 
         [Required]
-        [DateTime]
         [EndDateTimeAfterStartDateTime]
         public DateTime EndDateTime { get; set; }
 

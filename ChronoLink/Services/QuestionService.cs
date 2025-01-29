@@ -41,5 +41,13 @@ namespace ChronoLink.Services
         {
             return _questionResponseRepository.GetFavouriteQuestions(userId);
         }
+        public void RemoveQuestion(int id)
+        {
+            _questionResponseRepository.Delete(id);
+        }
+        public QuestionResponse GetQuestion(int id)
+        {
+            return _questionResponseRepository.GetById(id);
+        }
     }
 }

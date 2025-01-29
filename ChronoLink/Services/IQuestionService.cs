@@ -9,5 +9,7 @@ namespace ChronoLink.Services
         void MarkAsFavourite(int id);
         void RemoveFavourite(int id);
         IEnumerable<QuestionResponse> GetFavouriteQuestions(string userId);
+        void RemoveQuestion(int id);
+        QuestionResponse GetQuestion(int id);
     }
 }
