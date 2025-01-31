@@ -15,10 +15,12 @@ namespace ChronoLink.Controllers
     public class TasksController : ControllerBase
     {
         private readonly ITaskService _taskService;
+        private readonly WorkspaceService _workspaceService;
 
-        public TasksController(ITaskService taskService)
+        public TasksController(ITaskService taskService, WorkspaceService workspaceService)
         {
             _taskService = taskService;
+            _workspaceService = workspaceService;
         }
 
         // GET /api/tasks?workspace=xxx
@@ -67,12 +69,15 @@ namespace ChronoLink.Controllers
         [HttpPost]
         [Authorize(Policy = "WorkspaceAdmin")]
         public async Task<IActionResult> CreateTask(
-            [FromQuery] int? workspaceId,
+            [FromQuery] int workspaceId,
             [FromBody] CreateTaskRequest request
         )
         {
+
             try
             {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
                 var task = await _taskService.CreateTaskAsync(request, workspaceId);
                 return CreatedAtAction(nameof(GetTask), new { taskId = task.Id }, task);
             }
@@ -87,10 +92,6 @@ namespace ChronoLink.Controllers
         public async Task<IActionResult> GetTask(int taskId)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId))
-            {
-                return Unauthorized();
-            }
 
             var task = await _taskService.GetTaskAsync(taskId, userId);
             if (task == null)
@@ -136,7 +137,7 @@ namespace ChronoLink.Controllers
     // Request models
     public class CreateTaskRequest
     {
-        public string Description { get; set; }
+        public required string Description { get; set; }
         public DateTime StartDateTime { get; set; }
         public DateTime EndDateTime { get; set; }
         public required string UserId { get; set; }

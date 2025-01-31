@@ -2,6 +2,7 @@ using System.Security.Claims;
 using ChronoLink.Authorization;
 using ChronoLink.Data;
 using ChronoLink.Models;
+using ChronoLink.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,10 +15,12 @@ namespace ChronoLink.Controllers
     public class WorkspaceController : ControllerBase
     {
         private readonly AppDbContext _dbContext;
+        private readonly WorkspaceService _workspaceService;
 
-        public WorkspaceController(AppDbContext dbContext)
+        public WorkspaceController(AppDbContext dbContext, WorkspaceService workspaceService)
         {
             _dbContext = dbContext;
+            _workspaceService = workspaceService;
         }
 
         // GET /api/workspace
@@ -54,20 +57,7 @@ namespace ChronoLink.Controllers
         [Authorize(Policy = "WorkspaceMember")]
         public async Task<IActionResult> GetWorkspace(int workspaceId)
         {
-            var workspace = await _dbContext
-                .Workspaces.Where(w => w.Id == workspaceId)
-                .Select(w => new
-                {
-                    w.Id,
-                    w.Name,
-                    Members = w.WorkspaceUsers.Select(m => new
-                    {
-                        m.Id,
-                        m.User.Name,
-                        m.Role,
-                    }),
-                })
-                .FirstOrDefaultAsync();
+            var workspace = await _workspaceService.GetWorkspaceAsync(workspaceId);
 
             if (workspace == null)
             {
@@ -82,10 +72,6 @@ namespace ChronoLink.Controllers
         public async Task<IActionResult> CreateWorkspace([FromBody] CreateWorkspaceRequest request)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId))
-            {
-                return Unauthorized();
-            }
 
             // Create the workspace
             var workspace = new Workspace { Name = request.Name };

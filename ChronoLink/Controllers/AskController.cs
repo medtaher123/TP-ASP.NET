@@ -20,13 +20,15 @@ namespace ChronoLink.Controllers
         private readonly IAuthorizationService _authorizationService;
         private readonly UserManager<User> _userManager;
         private readonly ITaskService _taskService;
+        private readonly WorkspaceService _workspaceService;
 
         public AskController(
             IGeminiService geminiService,
             IQuestionResponseRepository questionResponseRepository,
             IAuthorizationService authorizationService,
             UserManager<User> userManager,
-            ITaskService taskService
+            ITaskService taskService,
+            WorkspaceService workspaceService
         )
         {
             _geminiService = geminiService;
@@ -34,6 +36,7 @@ namespace ChronoLink.Controllers
             _authorizationService = authorizationService;
             _userManager = userManager;
             _taskService = taskService;
+            _workspaceService = workspaceService;
         }
 
         [HttpPost]
@@ -48,35 +51,11 @@ namespace ChronoLink.Controllers
             {
                 // Extract userId from the authorization token
                 var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (string.IsNullOrEmpty(userId))
-                {
-                    return Unauthorized(new { Error = "User is not authenticated." });
-                }
 
-                // Fetch the user from the database to ensure they exist
-                var user = await _userManager.FindByIdAsync(userId);
-                if (user == null)
-                {
-                    return Unauthorized(new { Error = "User not found." });
-                }
-
-                // Check workspace-specific authorization if WorkspaceId is provided
-                if (request.WorkspaceId.HasValue)
-                {
-                    var authorizationResult = await _authorizationService.AuthorizeAsync(
-                        User,
-                        request.WorkspaceId.Value,
-                        "WorkspaceViewer"
-                    );
-
-                    if (!authorizationResult.Succeeded)
-                    {
-                        return Forbid(); // User does not have access to this workspace
-                    }
-                }
 
                 // Build the prompt and get the response from Gemini
                 var prompt = await BuildPrompt(userId, request.WorkspaceId);
+                //return Ok(prompt);
                 var response = await _geminiService.AskGeminiAsync(prompt, request.Question);
 
                 // Save the question and response
@@ -107,18 +86,39 @@ namespace ChronoLink.Controllers
         // TOFIX: Implement the above logic to build the prompt
         private async Task<string> BuildPrompt(string userId, int? workspaceId)
         {
-           var prompt = "You are an expert at task management and you were asked to analyze some data and provide a response. " +
-                 "Do not answer any questions unrelated to the tasks, whenever an irrelevant question is asked, say that you're a " +
-                 "bot for task management and that the user can ask anything he wants about the tasks or get suggestions about tasks. " +
-                 "You are given the following data: \n";
-    var tasks = await _taskService.GetMyTasksAsync(userId, workspaceId);
-    foreach (var task in tasks)
-    {
-        prompt += $"Task: {task.Description}\n";
-        prompt += $"Start: {task.StartDateTime}\n";
-        prompt += $"End: {task.EndDateTime}\n";
-    }
-    return prompt;
+            var user = await _userManager.FindByIdAsync(userId);
+
+            var prompt = "You are an expert at task management chatbot and you were asked to analyze some data and provide a response to the connected user. " +
+                  "Do not answer any questions unrelated to the tasks or workspace, whenever an irrelevant question is asked, say that you're a " +
+                  "bot for task management and that the user can ask anything he wants about the tasks or get suggestions about tasks. " +
+                  "You are given the following data: \n";
+            var tasks = await _taskService.GetMyTasksAsync(userId, workspaceId);
+            prompt += $"Now is ${DateTime.Now}\n";
+            prompt += $"User name: {user.Name}\n";
+            prompt += $"User email: {user.Email}\n";
+            if (workspaceId == null)
+            {
+                prompt += "User is connected to the personal calendar\n";
+            }
+            else
+            {
+                var workspace = await _workspaceService.GetByIdAsync(workspaceId.Value);
+                prompt += $"User is connected to the workspace: {workspace.Name}\n";
+                //TODO: get workspace members
+            }
+
+            prompt += $"User has {tasks.Count} tasks\n";
+            int i = 1;
+            foreach (var task in tasks)
+            {
+                prompt += $"Task {i}:\n";
+                prompt += $"    Task description: {task.Description}\n";
+                prompt += $"    Start: {task.StartDateTime}\n";
+                prompt += $"    End: {task.EndDateTime}\n";
+
+                i++;
+            }
+            return prompt;
         }
     }
 
