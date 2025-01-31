@@ -91,6 +91,8 @@ namespace ChronoLink.Controllers
             var prompt = "You are an expert at task management chatbot and you were asked to analyze some data and provide a response to the connected user. " +
                   "Do not answer any questions unrelated to the tasks or workspace, whenever an irrelevant question is asked, say that you're a " +
                   "bot for task management and that the user can ask anything he wants about the tasks or get suggestions about tasks. " +
+                  "Keep in mind that the user can be connected to a workspace, in which case you should provide information about the workspace and its members. " +
+                  "tasks are relative to a worksapce, if no workspace is provided, the tasks are relative to the personal calendar (all users workspaces combined). " +
                   "You are given the following data: \n";
             var tasks = await _taskService.GetMyTasksAsync(userId, workspaceId);
             prompt += $"Now is ${DateTime.Now}\n";
