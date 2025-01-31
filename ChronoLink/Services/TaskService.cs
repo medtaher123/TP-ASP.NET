@@ -4,6 +4,10 @@ using ChronoLink.Models;
 using Microsoft.EntityFrameworkCore;
 using Task = ChronoLink.Models.Task;
 using ChronoLink.Controllers;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using ChronoLink.Services;
+using ChronoLink.Dtos;
 namespace ChronoLink.Services
 {
     public interface ITaskService
@@ -11,7 +15,7 @@ namespace ChronoLink.Services
         Task<List<Task>> GetAllTasksAsync(string userId, int? workspaceId);
         Task<List<Task>> GetMyTasksAsync(string userId, int? workspaceId);
         Task<Task?> GetTaskAsync(int taskId, string userId);
-        Task<Task> CreateTaskAsync(CreateTaskRequest request, int? workspaceId);
+        Task<Task> CreateTaskAsync(CreateTaskRequest request, int workspaceId);
         Task<Task?> UpdateTaskAsync(int taskId, UpdateTaskRequest request);
         Task<bool> DeleteTaskAsync(int taskId);
     }
@@ -19,10 +23,14 @@ namespace ChronoLink.Services
     public class TaskService : ITaskService
     {
         private readonly AppDbContext _dbContext;
+        private readonly WorkspaceService _workspaceService;
 
-        public TaskService(AppDbContext dbContext)
+
+        public TaskService(AppDbContext dbContext, WorkspaceService workspaceService)
         {
             _dbContext = dbContext;
+            _workspaceService = workspaceService;
+
         }
 
         public async Task<List<Task>> GetAllTasksAsync(string userId, int? workspaceId)
@@ -31,15 +39,6 @@ namespace ChronoLink.Services
 
             if (workspaceId.HasValue)
             {
-                var isMember = await _dbContext.WorkspaceUsers.AnyAsync(wu =>
-                    wu.UserId == userId && wu.WorkspaceId == workspaceId.Value
-                );
-
-                if (!isMember)
-                {
-                    throw new UnauthorizedAccessException("User is not a member of the workspace.");
-                }
-
                 query = query.Where(t => t.WorkspaceUser.WorkspaceId == workspaceId.Value);
             }
 
@@ -61,15 +60,6 @@ namespace ChronoLink.Services
 
             if (workspaceId.HasValue)
             {
-                var isMember = await _dbContext.WorkspaceUsers.AnyAsync(wu =>
-                    wu.UserId == userId && wu.WorkspaceId == workspaceId.Value
-                );
-
-                if (!isMember)
-                {
-                    throw new UnauthorizedAccessException("User is not a member of the workspace.");
-                }
-
                 query = query.Where(t => t.WorkspaceUser.WorkspaceId == workspaceId.Value);
             }
 
@@ -95,37 +85,26 @@ namespace ChronoLink.Services
             {
                 return null;
             }
-
-            var isMember = await _dbContext.WorkspaceUsers.AnyAsync(wu =>
-                wu.UserId == userId && wu.WorkspaceId == task.WorkspaceUser.WorkspaceId
-            );
-
-            if (!isMember)
-            {
-                throw new UnauthorizedAccessException("User is not a member of the workspace.");
-            }
+            await _workspaceService.RequireUserIsMemberAsync(userId, task.WorkspaceUser.WorkspaceId);
 
             return task;
         }
 
-        public async Task<Task> CreateTaskAsync(CreateTaskRequest request, int? workspaceId)
+        public async Task<Task> CreateTaskAsync(CreateTaskRequest request, int workspaceId)
         {
-            var workspaceUser = await _dbContext.WorkspaceUsers.FirstOrDefaultAsync(wu =>
-                wu.UserId == request.UserId && wu.WorkspaceId == workspaceId
-            );
+            await _workspaceService.RequireUserIsMemberAsync(request.UserId, workspaceId);
 
-            if (workspaceUser == null)
-            {
-                throw new UnauthorizedAccessException("The user is not a member of the workspace.");
-            }
-
+            // we are sure that the user is a member of the workspace, so we can safely get the workspace user id
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
             var task = new Task
             {
                 Description = request.Description,
                 StartDateTime = request.StartDateTime,
                 EndDateTime = request.EndDateTime,
-                WorkspaceUserId = workspaceUser.Id,
+                WorkspaceUserId = _dbContext.WorkspaceUsers
+                    .FirstOrDefault(wu => wu.UserId == request.UserId && wu.WorkspaceId == workspaceId).Id,
             };
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
 
             _dbContext.Tasks.Add(task);
             await _dbContext.SaveChangesAsync();

@@ -32,6 +32,7 @@ builder.Services.AddScoped<IQuestionResponseRepository, QuestionResponseReposito
 builder.Services.AddScoped<IGeminiService, GeminiService>();
 builder.Services.AddScoped<IQuestionService, QuestionService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
+builder.Services.AddScoped<WorkspaceService>();
 
 // Register authorization services
 builder.Services.AddScoped<IAuthorizationHandler, WorkspaceAdminHandler>();
@@ -68,10 +69,10 @@ builder.Services.AddAuthorization(options =>
         "WorkspaceAdmin",
         policy => policy.Requirements.Add(new WorkspaceAdminRequirement())
     );
-     options.AddPolicy(
-        "WorkspaceMember",
-        policy => policy.Requirements.Add(new WorkspaceMemberRequirement())
-    );
+    options.AddPolicy(
+       "WorkspaceMember",
+       policy => policy.Requirements.Add(new WorkspaceMemberRequirement())
+   );
 });
 
 // Add swagger

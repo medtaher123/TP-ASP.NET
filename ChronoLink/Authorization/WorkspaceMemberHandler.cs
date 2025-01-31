@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text.Json;
 using ChronoLink.Data;
 using ChronoLink.Models;
+using ChronoLink.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,14 +13,19 @@ namespace ChronoLink.Authorization
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly AppDbContext _dbContext;
+        private readonly WorkspaceService _workspaceService;
 
         public WorkspaceMemberHandler(
             IHttpContextAccessor httpContextAccessor,
-            AppDbContext dbContext
+            AppDbContext dbContext,
+            WorkspaceService workspaceService
+
         )
         {
             _httpContextAccessor = httpContextAccessor;
             _dbContext = dbContext;
+            _workspaceService = workspaceService;
+
         }
 
         protected override async System.Threading.Tasks.Task HandleRequirementAsync(
@@ -47,10 +53,7 @@ namespace ChronoLink.Authorization
             }
 
             // Query the database to check if the user is an admin for the workspace
-            var isMember = await _dbContext.WorkspaceUsers.AnyAsync(wu =>
-                wu.UserId == userId
-                && wu.WorkspaceId == workspaceId
-            );
+            var isMember = await _workspaceService.IsUserInWorkspaceAsync(userId, workspaceId.Value);
 
             if (isMember)
             {
