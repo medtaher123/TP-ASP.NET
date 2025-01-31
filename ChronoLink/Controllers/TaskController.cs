@@ -23,7 +23,7 @@ namespace ChronoLink.Controllers
 
         // GET /api/tasks?workspace=xxx
         [HttpGet]
-        public async Task<IActionResult> GetAllTasks([FromQuery] int? workspace)
+        public async Task<IActionResult> GetAllTasks([FromQuery] int? workspaceId)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userId))
@@ -33,7 +33,7 @@ namespace ChronoLink.Controllers
 
             try
             {
-                var tasks = await _taskService.GetAllTasksAsync(userId, workspace);
+                var tasks = await _taskService.GetAllTasksAsync(userId, workspaceId);
                 return Ok(tasks);
             }
             catch (UnauthorizedAccessException)
@@ -44,7 +44,7 @@ namespace ChronoLink.Controllers
 
         // GET /api/my-tasks?workspace=xxx
         [HttpGet("my-tasks")]
-        public async Task<IActionResult> GetMyTasks([FromQuery] int? workspace)
+        public async Task<IActionResult> GetMyTasks([FromQuery] int? workspaceId)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userId))
@@ -54,7 +54,7 @@ namespace ChronoLink.Controllers
 
             try
             {
-                var tasks = await _taskService.GetMyTasksAsync(userId, workspace);
+                var tasks = await _taskService.GetMyTasksAsync(userId, workspaceId);
                 return Ok(tasks);
             }
             catch (UnauthorizedAccessException)
@@ -67,13 +67,13 @@ namespace ChronoLink.Controllers
         [HttpPost]
         [Authorize(Policy = "WorkspaceAdmin")]
         public async Task<IActionResult> CreateTask(
-            [FromQuery] int? workspace,
+            [FromQuery] int? workspaceId,
             [FromBody] CreateTaskRequest request
         )
         {
             try
             {
-                var task = await _taskService.CreateTaskAsync(request, workspace);
+                var task = await _taskService.CreateTaskAsync(request, workspaceId);
                 return CreatedAtAction(nameof(GetTask), new { taskId = task.Id }, task);
             }
             catch (UnauthorizedAccessException ex)

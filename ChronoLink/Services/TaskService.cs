@@ -8,10 +8,10 @@ namespace ChronoLink.Services
 {
     public interface ITaskService
     {
-        Task<List<Task>> GetAllTasksAsync(string userId, int? workspace);
-        Task<List<Task>> GetMyTasksAsync(string userId, int? workspace);
+        Task<List<Task>> GetAllTasksAsync(string userId, int? workspaceId);
+        Task<List<Task>> GetMyTasksAsync(string userId, int? workspaceId);
         Task<Task?> GetTaskAsync(int taskId, string userId);
-        Task<Task> CreateTaskAsync(CreateTaskRequest request, int? workspace);
+        Task<Task> CreateTaskAsync(CreateTaskRequest request, int? workspaceId);
         Task<Task?> UpdateTaskAsync(int taskId, UpdateTaskRequest request);
         Task<bool> DeleteTaskAsync(int taskId);
     }
@@ -25,14 +25,14 @@ namespace ChronoLink.Services
             _dbContext = dbContext;
         }
 
-        public async Task<List<Task>> GetAllTasksAsync(string userId, int? workspace)
+        public async Task<List<Task>> GetAllTasksAsync(string userId, int? workspaceId)
         {
             IQueryable<Task> query = _dbContext.Tasks;
 
-            if (workspace.HasValue)
+            if (workspaceId.HasValue)
             {
                 var isMember = await _dbContext.WorkspaceUsers.AnyAsync(wu =>
-                    wu.UserId == userId && wu.WorkspaceId == workspace.Value
+                    wu.UserId == userId && wu.WorkspaceId == workspaceId.Value
                 );
 
                 if (!isMember)
@@ -40,7 +40,7 @@ namespace ChronoLink.Services
                     throw new UnauthorizedAccessException("User is not a member of the workspace.");
                 }
 
-                query = query.Where(t => t.WorkspaceUser.WorkspaceId == workspace.Value);
+                query = query.Where(t => t.WorkspaceUser.WorkspaceId == workspaceId.Value);
             }
 
             return await query
@@ -55,14 +55,14 @@ namespace ChronoLink.Services
                 .ToListAsync();
         }
 
-        public async Task<List<Task>> GetMyTasksAsync(string userId, int? workspace)
+        public async Task<List<Task>> GetMyTasksAsync(string userId, int? workspaceId)
         {
             IQueryable<Task> query = _dbContext.Tasks.Where(t => t.WorkspaceUser.UserId == userId);
 
-            if (workspace.HasValue)
+            if (workspaceId.HasValue)
             {
                 var isMember = await _dbContext.WorkspaceUsers.AnyAsync(wu =>
-                    wu.UserId == userId && wu.WorkspaceId == workspace.Value
+                    wu.UserId == userId && wu.WorkspaceId == workspaceId.Value
                 );
 
                 if (!isMember)
@@ -70,7 +70,7 @@ namespace ChronoLink.Services
                     throw new UnauthorizedAccessException("User is not a member of the workspace.");
                 }
 
-                query = query.Where(t => t.WorkspaceUser.WorkspaceId == workspace.Value);
+                query = query.Where(t => t.WorkspaceUser.WorkspaceId == workspaceId.Value);
             }
 
             return await query
@@ -108,10 +108,10 @@ namespace ChronoLink.Services
             return task;
         }
 
-        public async Task<Task> CreateTaskAsync(CreateTaskRequest request, int? workspace)
+        public async Task<Task> CreateTaskAsync(CreateTaskRequest request, int? workspaceId)
         {
             var workspaceUser = await _dbContext.WorkspaceUsers.FirstOrDefaultAsync(wu =>
-                wu.UserId == request.UserId && wu.WorkspaceId == workspace
+                wu.UserId == request.UserId && wu.WorkspaceId == workspaceId
             );
 
             if (workspaceUser == null)
