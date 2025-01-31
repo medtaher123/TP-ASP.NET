@@ -8,5 +8,8 @@ namespace ChronoLink.Services
         IEnumerable<QuestionResponse> GetQuestions(string userId);
         void MarkAsFavourite(int id);
         void RemoveFavourite(int id);
+        IEnumerable<QuestionResponse> GetFavouriteQuestions(string userId);
+        void RemoveQuestion(int id);
+        QuestionResponse GetQuestion(int id);
     }
 }

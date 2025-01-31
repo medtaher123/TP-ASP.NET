@@ -31,6 +31,7 @@ builder.Services.AddScoped<IQuestionResponseRepository, QuestionResponseReposito
 // Register services
 builder.Services.AddScoped<IGeminiService, GeminiService>();
 builder.Services.AddScoped<IQuestionService, QuestionService>();
+builder.Services.AddScoped<ITaskService, TaskService>();
 
 // Register authorization services
 builder.Services.AddScoped<IAuthorizationHandler, WorkspaceAdminHandler>();

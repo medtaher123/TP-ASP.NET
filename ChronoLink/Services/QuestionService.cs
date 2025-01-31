@@ -35,6 +35,19 @@ namespace ChronoLink.Services
                 question.IsFavourite = false;
                 _questionResponseRepository.Update(question);
             }
+            
+        }
+        public IEnumerable<QuestionResponse> GetFavouriteQuestions(string userId)
+        {
+            return _questionResponseRepository.GetFavouriteQuestions(userId);
+        }
+        public void RemoveQuestion(int id)
+        {
+            _questionResponseRepository.Delete(id);
+        }
+        public QuestionResponse GetQuestion(int id)
+        {
+            return _questionResponseRepository.GetById(id);
         }
     }
 }

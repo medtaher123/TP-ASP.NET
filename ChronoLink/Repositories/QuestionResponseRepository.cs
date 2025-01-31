@@ -21,5 +21,22 @@ namespace ChronoLink.Repositories
         {
             return _context.QuestionResponses.Where(q => q.UserId == userId).ToList();
         }
+        public IEnumerable<QuestionResponse> GetFavouriteQuestions(string userId)
+        {
+            return _context.QuestionResponses.Where(q => q.UserId == userId && q.IsFavourite).ToList();
+        }
+        public QuestionResponse GetById(int id)
+        {
+            return _context.QuestionResponses.Find(id);
+        }
+        public void Delete(int id)
+        {
+            var question = GetById(id);
+            if (question != null)
+            {
+                _context.QuestionResponses.Remove(question);
+                _context.SaveChanges();
+            }
+        }
     }
 }
