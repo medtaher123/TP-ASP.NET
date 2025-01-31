@@ -15,7 +15,7 @@ namespace ChronoLink.Services
             _dbContext = context;
         }
 
-        public async Task<Workspace> GetByIdAsync(Guid id)
+        public async Task<Workspace> GetByIdAsync(int id)
         {
             var workspace = await _dbContext.Workspaces.FindAsync(id);
             if (workspace == null)
@@ -92,6 +92,22 @@ namespace ChronoLink.Services
             return await _dbContext.SaveChangesAsync();
         }
 
-
+        internal async Task<object> GetWorkspaceAsync(int workspaceId)
+        {
+            return await _dbContext
+                .Workspaces.Where(w => w.Id == workspaceId)
+                .Select(w => new
+                {
+                    w.Id,
+                    w.Name,
+                    Members = w.WorkspaceUsers.Select(m => new
+                    {
+                        m.Id,
+                        m.User.Name,
+                        m.Role,
+                    }),
+                })
+                .FirstOrDefaultAsync();
+        }
     }
 }
