@@ -55,7 +55,6 @@ namespace ChronoLink.Controllers
 
                 // Build the prompt and get the response from Gemini
                 var prompt = await BuildPrompt(userId, request.WorkspaceId);
-                //return Ok(prompt);
                 var response = await _geminiService.AskGeminiAsync(prompt, request.Question);
 
                 // Save the question and response
