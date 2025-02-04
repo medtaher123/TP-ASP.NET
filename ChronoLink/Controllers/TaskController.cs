@@ -73,17 +73,20 @@ namespace ChronoLink.Controllers
             [FromBody] CreateTaskRequest request
         )
         {
-
             try
             {
-                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
                 var task = await _taskService.CreateTaskAsync(request, workspaceId);
                 return CreatedAtAction(nameof(GetTask), new { taskId = task.Id }, task);
             }
             catch (UnauthorizedAccessException ex)
             {
-                return Forbid(ex.Message);
+                var problemDetails = new ProblemDetails
+                {
+                    Title = "Forbidden",
+                    Detail = ex.Message,
+                    Status = StatusCodes.Status403Forbidden
+                };
+                return StatusCode(StatusCodes.Status403Forbidden, problemDetails);
             }
         }
 
