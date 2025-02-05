@@ -166,7 +166,7 @@ namespace ChronoLink.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("Role")
+                    b.Property<bool>("IsAdmin")
                         .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("UserId")
