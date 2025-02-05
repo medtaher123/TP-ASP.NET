@@ -6,10 +6,10 @@ namespace ChronoLink.Services
     public interface IQuestionService
     {
         IEnumerable<QuestionResponse> GetQuestions(string userId);
-        void MarkAsFavourite(int id);
-        void RemoveFavourite(int id);
+        void MarkAsFavourite(int id, string userId);
+        void RemoveFavourite(int id, string userId);
         IEnumerable<QuestionResponse> GetFavouriteQuestions(string userId);
-        void RemoveQuestion(int id);
-        QuestionResponse GetQuestion(int id);
+        void RemoveQuestion(int id, string userId);
+        QuestionResponse GetQuestion(int id, string userId);
     }
 }

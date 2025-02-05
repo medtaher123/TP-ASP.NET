@@ -9,9 +9,9 @@ using Task = ChronoLink.Models.Task;
 
 namespace ChronoLink.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
     public class TasksController : ControllerBase
     {
         private readonly ITaskService _taskService;
@@ -28,20 +28,22 @@ namespace ChronoLink.Controllers
         public async Task<IActionResult> GetAllTasks([FromQuery] int? workspaceId)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId))
-            {
-                return Unauthorized();
-            }
-
             try
             {
                 var tasks = await _taskService.GetAllTasksAsync(userId, workspaceId);
                 return Ok(tasks);
             }
-            catch (UnauthorizedAccessException)
+            catch (UnauthorizedAccessException ex)
             {
-                return Forbid();
+                var problemDetails = new ProblemDetails
+                {
+                    Title = "Forbidden",
+                    Detail = ex.Message,
+                    Status = StatusCodes.Status403Forbidden
+                };
+                return StatusCode(StatusCodes.Status403Forbidden, problemDetails);
             }
+
         }
 
         // GET /api/my-tasks?workspace=xxx
@@ -59,9 +61,15 @@ namespace ChronoLink.Controllers
                 var tasks = await _taskService.GetMyTasksAsync(userId, workspaceId);
                 return Ok(tasks);
             }
-            catch (UnauthorizedAccessException)
+            catch (UnauthorizedAccessException ex)
             {
-                return Forbid();
+                var problemDetails = new ProblemDetails
+                {
+                    Title = "Forbidden",
+                    Detail = ex.Message,
+                    Status = StatusCodes.Status403Forbidden
+                };
+                return StatusCode(StatusCodes.Status403Forbidden, problemDetails);
             }
         }
 
@@ -94,15 +102,28 @@ namespace ChronoLink.Controllers
         [HttpGet("{taskId}")]
         public async Task<IActionResult> GetTask(int taskId)
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            var task = await _taskService.GetTaskAsync(taskId, userId);
-            if (task == null)
+            try
             {
-                return NotFound();
-            }
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            return Ok(task);
+                var task = await _taskService.GetTaskAsync(taskId, userId);
+                if (task == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(task);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                var problemDetails = new ProblemDetails
+                {
+                    Title = "Forbidden",
+                    Detail = ex.Message,
+                    Status = StatusCodes.Status403Forbidden
+                };
+                return StatusCode(StatusCodes.Status403Forbidden, problemDetails);
+            }
         }
 
         // PUT /api/tasks/{taskId}

@@ -22,42 +22,82 @@ namespace ChronoLink.Controllers
         public IActionResult GetQuestions()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            Console.WriteLine(userId);
             var questions = _questionService.GetQuestions(userId!);
             return Ok(questions);
         }
         [HttpGet("{id}")]
         public IActionResult GetQuestion(int id)
         {
-            var question = _questionService.GetQuestion(id);
-            return Ok(question);
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var question = _questionService.GetQuestion(id, userId!);
+                return Ok(question);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { Message = e.Message });
+            }
         }
         [HttpGet("favourite")]
         public IActionResult GetFavouriteQuestions()
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var questions = _questionService.GetFavouriteQuestions(userId!);
-            return Ok(questions);
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var questions = _questionService.GetFavouriteQuestions(userId!);
+                return Ok(questions);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { Message = e.Message });
+            }
         }
 
 
         [HttpPost("favourite/{id}")]
         public IActionResult MarkAsFavourite(int id)
         {
-            _questionService.MarkAsFavourite(id);
-            return Ok(new { Message = "Question marked as favourite" });
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                _questionService.MarkAsFavourite(id, userId!);
+                return Ok(new { Message = "Question marked as favourite" });
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { Message = e.Message });
+            }
         }
 
         [HttpDelete("favourite/{id}")]
         public IActionResult RemoveFavourite(int id)
         {
-            _questionService.RemoveFavourite(id);
-            return Ok(new { Message = "Question removed from favourites" });
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                _questionService.RemoveFavourite(id, userId!);
+                return Ok(new { Message = "Question removed from favourites" });
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { Message = e.Message });
+            }
         }
         [HttpDelete("{id}")]
         public IActionResult DeleteQuestion(int id)
         {
-            _questionService.RemoveQuestion(id);
-            return Ok(new { Message = "Question removed" });
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                _questionService.RemoveQuestion(id, userId!);
+                return Ok(new { Message = "Question removed" });
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { Message = e.Message });
+            }
         }
     }
 }

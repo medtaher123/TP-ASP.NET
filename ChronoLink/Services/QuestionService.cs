@@ -1,5 +1,7 @@
+using System.Security.Claims;
 using ChronoLink.Models;
 using ChronoLink.Repositories;
+using System.Collections.Generic;
 
 namespace ChronoLink.Services
 {
@@ -17,8 +19,13 @@ namespace ChronoLink.Services
             return _questionResponseRepository.GetQuestions(userId);
         }
 
-        public void MarkAsFavourite(int id)
+        public void MarkAsFavourite(int id, string userId)
         {
+            var userOwnsQuestion = userHasAccess(userId, id);
+            if (!userOwnsQuestion)
+            {
+                throw new UnauthorizedAccessException();
+            }
             var question = _questionResponseRepository.GetById(id);
             if (question != null)
             {
@@ -27,27 +34,50 @@ namespace ChronoLink.Services
             }
         }
 
-        public void RemoveFavourite(int id)
+        public void RemoveFavourite(int id, string userId)
         {
+            var userOwnsQuestion = userHasAccess(userId, id);
+            if (!userOwnsQuestion)
+            {
+                throw new UnauthorizedAccessException();
+            }
             var question = _questionResponseRepository.GetById(id);
             if (question != null)
             {
                 question.IsFavourite = false;
                 _questionResponseRepository.Update(question);
             }
-            
         }
         public IEnumerable<QuestionResponse> GetFavouriteQuestions(string userId)
         {
             return _questionResponseRepository.GetFavouriteQuestions(userId);
         }
-        public void RemoveQuestion(int id)
+        public void RemoveQuestion(int id, string userId)
         {
+            var userOwnsQuestion = userHasAccess(userId, id);
+            if (!userOwnsQuestion)
+            {
+                throw new UnauthorizedAccessException();
+            }
             _questionResponseRepository.Delete(id);
         }
-        public QuestionResponse GetQuestion(int id)
+        public QuestionResponse GetQuestion(int id, string userId)
         {
+            var userOwnsQuestion = userHasAccess(userId, id);
+            if (!userOwnsQuestion)
+            {
+                throw new UnauthorizedAccessException();
+            }
             return _questionResponseRepository.GetById(id);
+        }
+        private bool userHasAccess(string userId, int questionId)
+        {
+            var question = _questionResponseRepository.GetById(questionId);
+            if (question == null)
+            {
+                return false;
+            }
+            return question.UserId == userId;
         }
     }
 }

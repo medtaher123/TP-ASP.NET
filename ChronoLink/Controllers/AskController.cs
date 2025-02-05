@@ -82,7 +82,6 @@ namespace ChronoLink.Controllers
             }
         }
 
-        // TOFIX: Implement the above logic to build the prompt
         private async Task<string> BuildPrompt(string userId, int? workspaceId)
         {
             var user = await _userManager.FindByIdAsync(userId);
