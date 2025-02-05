@@ -188,6 +188,12 @@ namespace ChronoLink.Controllers
                 wu.WorkspaceId == workspaceId && wu.UserId == userId
             );
 
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (currentUserId == userId)
+            {
+                return BadRequest("You cannot revoke your admin privileges.");
+            }
+
             if (workspaceUser == null)
             {
                 return NotFound("User not found in the workspace.");
