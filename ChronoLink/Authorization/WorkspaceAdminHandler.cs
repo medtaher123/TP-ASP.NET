@@ -51,7 +51,7 @@ namespace ChronoLink.Authorization
             }
 
             // Query the database to check if the user is an admin for the workspace
-            var isAdmin = await _workspaceService.IsUserAdminInWorkspaceAsync(userId, workspaceId.Value);
+            var isAdmin = await _workspaceService.IsAdminWorkspaceAsync(userId, workspaceId.Value);
 
             if (isAdmin)
             {

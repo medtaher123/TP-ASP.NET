@@ -36,19 +36,11 @@ namespace ChronoLink.Services
         {
             IQueryable<Task> query = _dbContext.Tasks;
 
-            if (workspaceId.HasValue)
-            {
-                if (!isWorkspaceMember(workspaceId.Value, userId))
-                {
-                    throw new UnauthorizedAccessException("User is not a member of the workspace.");
-                }
-                query = query.Where(t => t.WorkspaceUser.WorkspaceId == workspaceId.Value);
-            }
-            else
+            if (!workspaceId.HasValue)
             {
                 query = query.Where(t => t.WorkspaceUser.UserId == userId);
-            }
 
+            }
             return await query
                 .Select(t => new TaskDto
                 {
@@ -68,14 +60,6 @@ namespace ChronoLink.Services
             IQueryable<Task> query = _dbContext.Tasks;
 
             if (workspaceId.HasValue)
-            {
-                if (!isWorkspaceMember(workspaceId.Value, userId))
-                {
-                    throw new UnauthorizedAccessException("User is not a member of the workspace.");
-                }
-                query = query.Where(t => t.WorkspaceUser.WorkspaceId == workspaceId.Value);
-            }
-            else
             {
                 query = query.Where(t => t.WorkspaceUser.UserId == userId);
             }

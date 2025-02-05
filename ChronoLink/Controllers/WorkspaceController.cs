@@ -44,7 +44,7 @@ namespace ChronoLink.Controllers
                     {
                         m.UserId,
                         m.User.Name,
-                        m.Role,
+                        m.IsAdmin,
                     }),
                 })
                 .ToListAsync();
@@ -83,7 +83,7 @@ namespace ChronoLink.Controllers
             {
                 UserId = userId,
                 WorkspaceId = workspace.Id,
-                Role = WorkspaceRole.Admin,
+                IsAdmin = true,
             };
             _dbContext.WorkspaceUsers.Add(workspaceUser);
             await _dbContext.SaveChangesAsync();
@@ -167,7 +167,7 @@ namespace ChronoLink.Controllers
             {
                 UserId = request.UserId,
                 WorkspaceId = workspaceId,
-                Role = request.Role,
+                IsAdmin = request.IsAdmin,
             };
             _dbContext.WorkspaceUsers.Add(workspaceUser);
             await _dbContext.SaveChangesAsync();
@@ -193,7 +193,7 @@ namespace ChronoLink.Controllers
                 return NotFound("User not found in the workspace.");
             }
 
-            workspaceUser.Role = request.Role;
+            workspaceUser.IsAdmin = request.IsAdmin;
             await _dbContext.SaveChangesAsync();
 
             return Ok();
@@ -219,7 +219,7 @@ namespace ChronoLink.Controllers
                 return NotFound("User not found in the workspace.");
             }
 
-            if (workspaceUser.Role == WorkspaceRole.Admin)
+            if (workspaceUser.IsAdmin == true)
             {
                 return BadRequest("Cannot remove an admin.");
             }
@@ -245,11 +245,11 @@ namespace ChronoLink.Controllers
     public class AddUserRequest
     {
         public string UserId { get; set; }
-        public WorkspaceRole Role { get; set; }
+        public bool IsAdmin { get; set; }
     }
 
     public class UpdateUserRoleRequest
     {
-        public WorkspaceRole Role { get; set; }
+        public bool IsAdmin { get; set; }
     }
 }

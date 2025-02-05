@@ -23,15 +23,9 @@ namespace ChronoLink.Models
 
         [Required]
         [Column(TypeName = "nvarchar(20)")]
-        public WorkspaceRole Role { get; set; } = WorkspaceRole.Member;
+        public bool IsAdmin { get; set; } = false;
 
         [JsonIgnore]
         public ICollection<Task> Tasks { get; set; } = new List<Task>();
-    }
-
-    public enum WorkspaceRole
-    {
-        Admin,
-        Member,
     }
 }

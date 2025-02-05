@@ -48,6 +48,7 @@ namespace ChronoLink.Controllers
 
         // GET /api/my-tasks?workspace=xxx
         [HttpGet("my-tasks")]
+        [Authorize(Policy = "WorkspaceMember")]
         public async Task<IActionResult> GetMyTasks([FromQuery] int? workspaceId)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
